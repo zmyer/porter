@@ -1,10 +1,18 @@
-/**
- * All rights Reserved, Designed By Suixingpay.
+/*
+ * Copyright ©2018 vbill.cn.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author: hexin[he_xin@suixingpay.com]
- * @date: 2018年12月04日 10时27分
- * @Copyright 2018 Suixingpay. All rights reserved.
- * 注意：本内容仅限于随行付支付有限公司内部传阅，禁止外泄以及用于其他的商业用途。
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * </p>
  */
 package cn.vbill.middleware.porter.manager.service.impl;
 
@@ -18,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Classname CRoleMenuServiceImpl
@@ -36,13 +43,13 @@ public class CRoleMenuServiceImpl implements CRoleMenuService {
     @Override
     public void insert(List<CRoleMenuVo> cRoleMenuVoList) {
 
-        for(CRoleMenuVo cRoleMenuVo : cRoleMenuVoList){
+        for (CRoleMenuVo cRoleMenuVo : cRoleMenuVoList) {
             // 获取权限编号并删除以前的记录
             String roleCode = cRoleMenuVo.getRoleCode();
             cRoleMenuMapper.delete(roleCode);
             // 新增某一权限所能访问的菜单
             List<CRoleMenu> cRoleMenuList = cRoleMenuVo.getcRoleMenuList();
-            if(cRoleMenuList != null && cRoleMenuList.size() > 0){
+            if (cRoleMenuList != null && cRoleMenuList.size() > 0) {
                 cRoleMenuMapper.insert(cRoleMenuList);
             }
         }

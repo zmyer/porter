@@ -80,9 +80,52 @@ public class CMenuServiceImpl implements CMenuService {
     }
 
     @Override
-    public List<CMenu> getAll() {
-        List<CMenu> menuList = cmenuMapper.getAll();
+    public List<CMenu> getAll(Integer state) {
+        List<CMenu> menuList = cmenuMapper.getAll(state);
         return listMenu(menuList);
+    }
+
+    @Override
+    public Integer addMenu(CMenu cMenu) {
+        Integer num = cmenuMapper.checkCode(cMenu.getCode());
+        // 检查code编码是否重复
+        if (num != null) {
+            return -1;
+        }
+        return cmenuMapper.addMenu(cMenu);
+    }
+
+    @Override
+    public Integer updateState(String code, Integer state) {
+        // 拿到当前菜单的所有子菜单
+        List<String> codeList = cmenuMapper.getCode(code);
+        // 如果集合为空则认为此菜单为子菜单
+        if (codeList == null || codeList.size() == 0) {
+            cmenuMapper.updateSingleState(code, state);
+        }
+        // 把当前菜单放入到list中
+        codeList.add(code);
+        // 修改状态
+        return cmenuMapper.updateState(codeList, state);
+    }
+
+    @Override
+    public Integer updateMenu(CMenu cMenu) {
+        return cmenuMapper.updateMenu(cMenu);
+    }
+
+    @Override
+    public Integer deleteMenu(String code) {
+        // 拿到当前菜单的所有子菜单
+        List<String> codeList = cmenuMapper.getCode(code);
+        // 如果集合为空则认为此菜单为子菜单
+        if (codeList == null || codeList.size() == 0) {
+            cmenuMapper.deleteSingleMenu(code);
+        }
+        // 把当前菜单放入到list中
+        codeList.add(code);
+        // 逻辑删除菜单信息
+        return cmenuMapper.deleteMenu(codeList);
     }
 
     /**
@@ -96,7 +139,7 @@ public class CMenuServiceImpl implements CMenuService {
         List<CMenu> parentMenu = new ArrayList<CMenu>();
         for (CMenu cMenu : menuList) {
             // 一级菜单的编号的-1
-            if("-1".equals(cMenu.getFathercode())) {
+            if ("-1".equals(cMenu.getFathercode())) {
                 parentMenu.add(cMenu);
             }
         }
@@ -118,18 +161,18 @@ public class CMenuServiceImpl implements CMenuService {
     private List<CMenu> getChildMenu(String fathercode, List<CMenu> menuList) {
         // 保存所有的二级菜单
         List<CMenu> childMenu = new ArrayList<CMenu>();
-        for(CMenu cMenu : menuList) {
+        for (CMenu cMenu : menuList) {
             // 如果菜单的父菜单编号和这个菜单编号相同则认为这个菜单为二级菜单
-            if(cMenu.getFathercode().equals(fathercode)){
+            if (cMenu.getFathercode().equals(fathercode)) {
                 childMenu.add(cMenu);
             }
         }
         // 递归得到此一级菜单下所有的子菜单
-        for(CMenu cMenu : childMenu){
+        for (CMenu cMenu : childMenu) {
             cMenu.setMenus(getChildMenu(cMenu.getCode(), menuList));
         }
         // 如果子菜单集合为空，则菜单下没有子菜单了
-        if(childMenu.size() == 0) {
+        if (childMenu.size() == 0) {
             return new ArrayList<CMenu>();
         }
         return childMenu;
